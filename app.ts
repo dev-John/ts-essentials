@@ -1,23 +1,16 @@
-function combine(
-  input1: number | string,
-  input2: number | string,
-  resultConversion: "as-number" | "as-text"
-) {
-  let result;
-  if (
-    (typeof input1 === "number" && typeof input2 === "number") ||
-    resultConversion === "as-number"
-  ) {
-    result = +input1 + +input2;
-  } else {
-    result = input1.toString() + input2.toString();
-  }
+let userInput: unknown; // like any but more restrictive, with some type checking
+let userName: string;
 
-  return result;
+userInput = 5;
+userInput = "Teste";
+
+if (typeof userInput === "string") {
+  userName = userInput;
 }
 
-const combinedAges = combine(30, 26, "as-number");
-console.log(combinedAges);
+function generateError(message: string, code: number): never {
+  // never type says that the function is meant to never return values
+  throw { message, errorCode: code };
+}
 
-const combinedNames = combine("Dev", "John", "as-text");
-console.log(combinedNames);
+generateError("An error occurred", 500);
