@@ -1,10 +1,23 @@
+function sum(n1: number, n2: number) {
+  return n1 + n2;
+}
+
+const number1 = 5;
+const number2 = 2.8;
+
+const result = sum(number1, number2);
+
+console.log(result);
+
+// some more
+
 let userInput: unknown; // like any but more restrictive, with some type checking
 let userName: string;
 
 userInput = 5;
-userInput = "Teste";
+userInput = 'Teste';
 
-if (typeof userInput === "string") {
+if (typeof userInput === 'string') {
   userName = userInput;
 }
 
@@ -13,4 +26,4 @@ function generateError(message: string, code: number): never {
   throw { message, errorCode: code };
 }
 
-generateError("An error occurred", 500);
+generateError('An error occurred', 500);
