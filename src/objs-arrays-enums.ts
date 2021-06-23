@@ -1,4 +1,4 @@
-// const person: {
+// const pers: {
 //   name: string;
 //   age: number;
 //   hobbies: string[];
@@ -13,21 +13,21 @@
 enum Role {
   ADMIN, // defaults set it to 0
   READ_ONLY = 3, // I can set a value if I want
-  AUTHOR = "AUTHOR", // the following item increases
+  AUTHOR = 'AUTHOR', // the following item increases
 }
 
-const person = {
-  name: "Jonatas",
+const pers = {
+  name: 'Jonatas',
   age: 21,
-  hobbies: ["Sports", "Cooking"],
+  hobbies: ['Sports', 'Cooking'],
   role: Role.ADMIN,
 };
 
 let favouriteActivities: string[];
-favouriteActivities = ["Sports"];
+favouriteActivities = ['Sports'];
 
-console.log(person.name);
+console.log(pers.name);
 
-for (const hobby of person.hobbies) {
+for (const hobby of pers.hobbies) {
   console.log(hobby.toUpperCase());
 }

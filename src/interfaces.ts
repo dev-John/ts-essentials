@@ -19,7 +19,7 @@ interface Greetable extends Named {
   greet(phrase: string): void;
 }
 
-class Person implements Greetable {
+class Pers implements Greetable {
   name?: string;
   age = 30;
 
@@ -38,7 +38,7 @@ class Person implements Greetable {
   }
 }
 
-const user1 = new Person();
+const user1 = new Pers();
 
 user1.greet('Hi there - I am');
 console.log(user1);
