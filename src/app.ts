@@ -1,150 +1,110 @@
-type Admin = {
-  name: string;
-  privileges: string[];
-};
+// generic types
+// const names: Array<string> = []; // string[]
+// names[0].split(' ');
 
-type Employee = {
-  name: string;
-  startDate: Date;
-};
+// const promise: Promise<string> = new Promise((resolve, reject) => {
+//   setTimeout(() => {
+//     resolve('Test');
+//   }, 2000);
+// });
 
-//this
-// interface ElevatedEmployee extends Employee, Admin {} - for using this, Employee and Admin should also be Interfaces
-// or
-type ElevatedEmployee = Admin & Employee;
+// promise.then((data) => {
+//   data.split(' ');
+// });
 
-const e1: ElevatedEmployee = {
-  name: 'Jon',
-  startDate: new Date('2021-05-10'),
-  privileges: ['Admin Access', 'Create Server'],
-};
-
-// intersection types
-type Combinable = string | number;
-type Numeric = number | boolean;
-
-type Universal = Combinable & Numeric;
-
-console.log('It works!');
-
-// function overloads
-function addd(a: number, b: number): number;
-function addd(a: string, b: string): string;
-function addd(a: string, b: number): string;
-function addd(a: number, b: string): string;
-function addd(a: Combinable, b: Combinable) {
-  if (typeof a === 'string' || typeof b === 'string') {
-    return a.toString() + b.toString();
-  }
-
-  return a + b;
+// extends object forces the T generic type to be an object
+function merge<T extends object, U extends object, V>(
+  objA: T,
+  objB: U,
+  objC: V
+) {
+  return Object.assign(objA, objB, objC);
 }
 
-const addedValue = addd('Max', 'Schwarz');
-addedValue.split(' ');
+const mergedObj = merge(
+  { name: 'Max', hobbies: ['Sports'] },
+  { age: 30 },
+  { profession: 'programmer' }
+);
+console.log(mergedObj);
 
-const fetchedUserData = {
-  id: 'u1',
-  name: 'Max',
-  job: { title: 'CEO', description: 'My own company' },
-};
-
-console.log(fetchedUserData?.job?.title);
-
-const input = null;
-
-// const storedData = input || 'DEFAULT';
-const storedData = input ?? 'DEFAULT'; // ?? means only null or undefined, not ''
-
-console.log('storedData', storedData);
-
-type UnknownEmployee = Employee | Admin;
-
-function printeEmployeeInformation(emp: UnknownEmployee) {
-  console.log('Name: ' + emp.name);
-  if ('privileges' in emp) {
-    console.log('Privileges ' + emp.privileges);
-  }
-  if ('startDate' in emp) {
-    console.log('Start Date ' + emp.startDate);
-  }
+interface Lengthy {
+  length: number;
 }
 
-printeEmployeeInformation(e1);
+function countAndDescribe<T extends Lengthy>(element: T): [T, string] {
+  let descriptionText = 'Got no value';
+  if (element.length === 1) {
+    descriptionText = 'Got 1 element';
+  } else if (element.length > 1) {
+    descriptionText = 'Got ' + element.length + ' elements';
+  }
+  return [element, descriptionText];
+}
 
-class Car {
-  drive() {
-    console.log('Driving...');
+console.log(countAndDescribe(['Sports', 'Cooking']));
+
+// keyof tells TS that U is a key of the T object
+function extractAndConvert<T extends object, U extends keyof T>(
+  obj: T,
+  key: U
+) {
+  return 'Value: ' + obj[key];
+}
+
+console.log(extractAndConvert({ name: 'Max' }, 'name'));
+
+// generic class
+class DataStorage<T extends string | number | boolean> {
+  private data: T[] = [];
+
+  addItem(item: T) {
+    this.data.push(item);
+  }
+
+  removeItem(item: T) {
+    if (this.data.indexOf(item) === -1) {
+      return;
+    }
+    this.data.splice(this.data.indexOf(item), 1);
+  }
+
+  getItems() {
+    return [...this.data];
   }
 }
 
-class Truck {
-  drive() {
-    console.log('Driving a Truck...');
-  }
+const textStorage = new DataStorage<string>();
+textStorage.addItem('Max');
+textStorage.addItem('Manu');
+textStorage.removeItem('Max');
+console.log(textStorage.getItems());
 
-  loadCargo(amount: number) {
-    console.log('Loading cargo...' + amount);
-  }
+const numberStorage = new DataStorage<number>();
+numberStorage.addItem(1);
+numberStorage.addItem(2);
+numberStorage.removeItem(2);
+console.log(numberStorage.getItems());
+
+interface CourseGoal {
+  title: string;
+  description: string;
+  completeUntil: Date;
 }
 
-type Vehicle = Car | Truck;
+function createCourseGoal(
+  title: string,
+  description: string,
+  date: Date
+): CourseGoal {
+  // utility types (Partial, Readonly...)
+  let courseGoal: Partial<CourseGoal> = {};
+  courseGoal.title = title;
+  courseGoal.description = description;
+  courseGoal.completeUntil = date;
 
-const v1 = new Car();
-const v2 = new Truck();
-
-function useVehicle(vehicle: Vehicle) {
-  vehicle.drive();
-  if (vehicle instanceof Truck) {
-    vehicle.loadCargo(1000);
-  }
+  return courseGoal as CourseGoal;
 }
 
-useVehicle(v1);
-
-interface Bird {
-  type: 'bird';
-  flyingSpeed: number;
-}
-
-interface Horse {
-  type: 'horse';
-  runningSpeed: number;
-}
-
-type Animal = Bird | Horse;
-
-function moveAnimal(animal: Animal) {
-  let speed;
-  switch (animal.type) {
-    case 'bird':
-      speed = animal.flyingSpeed;
-      break;
-    case 'horse':
-      speed = animal.runningSpeed;
-      break;
-  }
-  console.log('Moving at speed: ' + speed);
-}
-
-moveAnimal({ type: 'bird', flyingSpeed: 30 });
-moveAnimal({ type: 'horse', runningSpeed: 50 });
-
-// const userInputElement = <HTMLInputElement>document.getElementById('user-input')!;
-const userInputElement = document.getElementById(
-  'user-input'
-) as HTMLInputElement;
-
-if (userInputElement) {
-  (userInputElement as HTMLInputElement).value = 'Hi there!';
-}
-
-interface ErrorContainer {
-  // { email: 'Not a valid email', username: 'Must start with a capital character!' }
-  [prop: string]: string;
-}
-
-const errorBag: ErrorContainer = {
-  email: 'Not a valid email!',
-  username: 'Must start with a capital character!',
-};
+// this can be assigned only once
+const names: Readonly<string[]> = ['Max', 'Anna'];
