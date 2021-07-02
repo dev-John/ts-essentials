@@ -8,22 +8,31 @@ function Logger(logString: string) {
 function WithTemplate(template: string, hookId: string) {
   // return (_: Function) => {
   // _ tells TS that even receiving the constructor I won't use it
-  return (constructor: any) => {
-    const hookEl = document.getElementById(hookId);
-    const p = new constructor();
-    if (hookEl) {
-      hookEl.innerHTML = template;
-      hookEl.querySelector('h1')!.textContent = p.name;
-    }
+  console.log("Template factory");
+  return <T extends { new (...args: any[]): { name: string } }>(
+    originalConstructor: T
+  ) => {
+    return class extends originalConstructor {
+      constructor(..._: any[]) {
+        super();
+        console.log("Rendering template");
+        const hookEl = document.getElementById(hookId);
+
+        if (hookEl) {
+          hookEl.innerHTML = template;
+          hookEl.querySelector("h1")!.textContent = this.name;
+        }
+      }
+    };
   };
 }
 // @Logger('LOGGING - PERSON')
-@WithTemplate('<h1>My Personal Object</h1>', 'app')
+@WithTemplate("<h1>My Personal Object</h1>", "app")
 class Person {
-  name = 'Max';
+  name = "Max";
 
   constructor() {
-    console.log('Creating person object...');
+    console.log("Creating person object...");
   }
 }
 
@@ -34,12 +43,12 @@ console.log(person);
 // ---
 
 function Log(target: any, propertyName: string | Symbol) {
-  console.log('Property decorator!');
+  console.log("Property decorator!");
   console.log(target, propertyName);
 }
 
 function Log2(target: any, name: string, descriptor: PropertyDescriptor) {
-  console.log('Accessor decorator!');
+  console.log("Accessor decorator!");
   console.log(target);
   console.log(name);
   console.log(descriptor);
@@ -50,14 +59,14 @@ function Log3(
   name: string | Symbol,
   descriptor: PropertyDescriptor
 ) {
-  console.log('Method decorator!');
+  console.log("Method decorator!");
   console.log(target);
   console.log(name);
   console.log(descriptor);
 }
 
 function Log4(target: any, name: string | Symbol, position: number) {
-  console.log('Parameter decorator!');
+  console.log("Parameter decorator!");
   console.log(target);
   console.log(name);
   console.log(position);
@@ -73,7 +82,7 @@ class Product {
     if (val > 0) {
       this._price = val;
     } else {
-      throw new Error('Invalid price - should be positive!');
+      throw new Error("Invalid price - should be positive!");
     }
   }
 
@@ -87,3 +96,58 @@ class Product {
     return this._price * (1 + tax);
   }
 }
+
+function Autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value;
+  const adjDescriptor: PropertyDescriptor = {
+    configurable: true,
+    enumerable: false,
+    get() {
+      const boundFn = originalMethod.bind(this);
+      return boundFn;
+    },
+  };
+  return adjDescriptor;
+}
+class Printer {
+  message = "This works";
+
+  @Autobind
+  showMessage() {
+    console.log(this.message);
+  }
+}
+
+const p = new Printer();
+
+const button = document.querySelector("button")!;
+button.addEventListener("click", p.showMessage);
+
+function Required() {}
+function PositiveNumber() {}
+function validate(obj: object) {}
+
+class Course {
+  @Required
+  title: string;
+  @PositiveNumber
+  price: number;
+
+  constructor(t: string, p: number) {
+    this.title = t;
+    this.price = p;
+  }
+}
+
+const courseForm = document.querySelector("form")!;
+courseForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const titleEl = document.getElementById("title") as HTMLInputElement;
+  const priceEl = document.getElementById("price") as HTMLInputElement;
+
+  const title = titleEl.value;
+  const price = +priceEl.value;
+
+  const createdCourse = new Course(title, price);
+  console.log(createdCourse);
+});
